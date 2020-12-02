@@ -1,49 +1,58 @@
 package com.company;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        //{{},{},{}}
-        ArrayList<ArrayList<String>> excel = new ArrayList<>();
-
-        //someday: select a file through gui
+        //ToDo someday: select a file through gui
+        //ToDo someday: refinement.txt
 
         //Source file
-        File salesSource = new File("C:\\Users\\evgnn\\Desktop\\Excsales\\src\\_chat.txt");
-        Scanner reader = new Scanner(salesSource);
+        Scanner sourceReader = getSourceFile("C:\\Users\\evgnn\\Desktop\\Excsales\\src\\_chat.txt");
 
         //Create output file
-        File salesCSV = new File("C:\\Users\\evgnn\\Desktop\\Excsales\\src\\sales.csv");
-        salesCSV.createNewFile();
+        File salesCSV = makeOutputFile("C:\\Users\\evgnn\\Desktop\\Excsales\\src\\sales.csv");
+
+        //Convert source file to csv, and save it
+        sourceToCSV(sourceReader,salesCSV);
+
+    }
+
+    //Given a scanner on the source file, and a File object for the destination file, puts tuples into a .csv file
+    //Assumes each tuple in the file is of the same size
+    private static void sourceToCSV(Scanner sourceReader, File salesCSV) throws IOException {
 
         //Initialize writer
         FileWriter fiWrite = new FileWriter(salesCSV);
         BufferedWriter fiWrite2 = new BufferedWriter(fiWrite);
 
-        while(reader.hasNextLine()){
-            //System.out.println(reader.nextLine());
-            String currentMessage = reader.nextLine();
-            //System.out.println(currentMessage);
+        //Convert to csv file
+        while(sourceReader.hasNextLine()){
+            String currentMessage = sourceReader.nextLine();
+            //If current line has a tuple, add it to our csv file
             if(currentMessage.contains("(")){
-                //System.out.println(currentMessage);
-                //Pattern getTuple = Pattern.compile("(Brochas, 85,45)");
                 String trips = currentMessage.substring(currentMessage.indexOf("(")+1, currentMessage.indexOf(")"));
-                //str.substring(str.indexOf("[") + 1, str.indexOf("]"));
-                //System.out.println(result);
-                System.out.println(trips);
                 fiWrite2.write(trips);
                 fiWrite2.newLine();
-                //fiWrite.write();
             }
         }
         fiWrite2.close();
+    }
 
+    //Given a specified path for the output (including the desired name of the *.csv file), will make a file
+    //  and return a File object to that file
+    private static File makeOutputFile(String destination) throws IOException {
+        File salesCSV = new File(destination);
+        salesCSV.createNewFile();
+        return salesCSV;
+    }
 
-
-
+    //Given a path to a text file, will return a scanner on that file
+    private static Scanner getSourceFile(String filePath) throws FileNotFoundException {
+        File salesSource = new File(filePath);
+        Scanner reader = new Scanner(salesSource);
+        return reader;
     }
 }
